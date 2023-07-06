@@ -13,7 +13,7 @@ class UserPolicy
      */
     public function viewAny(User $user)
     {
-        if( $user->hasRole( ['Administrador'] ) || $user->hasPermissionTo('Create user') ){
+        if( $user->hasRole( ['Administrador'] ) || $user->hasPermissionTo('Consult user') ){
             return true;
             }
             return false;
