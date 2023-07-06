@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use App\Models\City;
 
 class CitySeeder extends Seeder
 {
@@ -12,6 +13,11 @@ class CitySeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $dep1= City::create(['name' => 'ABREGO',
+                             'department_id' => '2'
+    ]);
+    $dep1= City::create(['name' => 'bejorral',
+    'department_id' => '1'
+]);
     }
 }
