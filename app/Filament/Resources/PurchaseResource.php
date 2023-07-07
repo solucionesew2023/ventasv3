@@ -24,6 +24,7 @@ use Filament\Forms\Components\Card;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
 
 class PurchaseResource extends Resource
 {
@@ -63,29 +64,49 @@ class PurchaseResource extends Resource
                                 ]),
                      Fieldset::make('Purchase detail')
                     ->schema([
-                        Select::make('product_id')->label('Product')
+
+
+                        Select::make('product_ida')->label('Product')
                         ->required()
                         ->options(Product::all()->pluck('name', 'id'))
                         ->searchable(),
-                        TextInput::make('purchase_price')->numeric()
+                        TextInput::make('product_pricea')->numeric()
                                     ->required()
                                     ->minValue(1),
-                        TextInput::make('quantity')->numeric()
+                        TextInput::make('product_amounta')->numeric()
                                     ->required()
                                     ->minValue(1),
-                        Select::make('color')->label('Color')
+                        Select::make('colora')->label('Color')
                         ->required()
                         ->options(Color::all()->pluck('name', 'id'))
                         ->searchable(),
-                        Select::make('size')->label('Size')
+                        Select::make('sizea')->label('Size')
                         ->required()
                         ->options(Size::all()->pluck('name', 'id'))
-                        ->searchable(),
+                        ->searchable()
+                        ->reactive()
+                        ->afterStateUpdated(fn ($state, callable $set)=> $set('product_id','product_ida'))
+
+
+
+                        ,
+
+                Repeater::make('Product_purchases')
+                        ->relationship()
+
+                        ->schema([
+                            TextInput::make('product_id')->disabled(),
+                            TextInput::make('purchase_price')->disabled(),
+                            TextInput::make('product_amount')->disabled(),
+                            TextInput::make('color')->disabled(),
+                            TextInput::make('size')->disabled(),
+
+                        ])
+
+
 
                     ])
                     ->columns(5)
-
-
 
 
 
@@ -96,10 +117,14 @@ class PurchaseResource extends Resource
     {
         return $table
             ->columns([
-
                 TextColumn::make('id')->sortable(),
                 TextColumn::make('provider.name')->sortable()->searchable(),
-
+                TextColumn::make('purchase_date')
+                                ->date('d-M-Y')
+                                ->sortable()->searchable(),
+                TextColumn::make('state')->sortable()->searchable(),
+                TextColumn::make('invoice_number')->sortable()->searchable(),
+                TextColumn::make('total')->sortable()->searchable(),
             ])
             ->filters([
                 //

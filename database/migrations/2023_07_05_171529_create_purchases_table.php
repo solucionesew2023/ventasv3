@@ -13,8 +13,7 @@ return new class extends Migration
     {
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('provider_id');
-            $table->foreign('provider_id')->references('id')->on('providers');
+            $table->foreignId('provider_id')->constrained()->onDelete('cascade');
             $table->date('purchase_date');
             $table->string('invoice_number');
             $table->string('state');

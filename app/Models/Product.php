@@ -45,15 +45,7 @@ class Product extends Model
         return $this->belongsToMany(Size::class)->withPivot('quantity','purchase_price','profit_percentage');
 
     }
-    public function shopping(){
-        //relacion muchos a muchos productos compras
-        return $this->belongsToMany(Shopping::class)->withPivot(
-                                                        'quantity',
-                                                        'purchase_price',
-                                                        'subtotal',
-                                                        'color',
-                                                        'size');
-      }
+    
 
 
     //Relacion uno a muchos entre productos e imagenes
