@@ -6,6 +6,9 @@ use App\Filament\Resources\PurchaseResource\Pages;
 use App\Filament\Resources\PurchaseResource\RelationManagers;
 use App\Models\Purchase;
 use App\Models\Provider;
+use App\Models\Product;
+use App\Models\Color;
+use App\Models\Size;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -14,6 +17,7 @@ use Filament\Tables;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Forms\Components\Grid;
+use Filament\Forms\Components\Fieldset;
 
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\Card;
@@ -43,7 +47,6 @@ class PurchaseResource extends Resource
                     '2xl' => 5,
                 ])
                     ->schema([
-
                             Select::make('provider_id')->label('Provaider')
                         ->options(Provider::all()->pluck('name', 'id'))
                         ->searchable(),
@@ -55,12 +58,32 @@ class PurchaseResource extends Resource
                                     'paid' => 'Paid',
                                     'pass' => 'pass' ]),
                                     TextInput::make('total')->numeric()
-                                    ->required(),
-
-
-
+                                    ->required()
+                                    ->minValue(1),
+                                ]),
+                     Fieldset::make('Purchase detail')
+                    ->schema([
+                        Select::make('product_id')->label('Product')
+                        ->required()
+                        ->options(Product::all()->pluck('name', 'id'))
+                        ->searchable(),
+                        TextInput::make('purchase_price')->numeric()
+                                    ->required()
+                                    ->minValue(1),
+                        TextInput::make('quantity')->numeric()
+                                    ->required()
+                                    ->minValue(1),
+                        Select::make('color')->label('Color')
+                        ->required()
+                        ->options(Color::all()->pluck('name', 'id'))
+                        ->searchable(),
+                        Select::make('size')->label('Size')
+                        ->required()
+                        ->options(Size::all()->pluck('name', 'id'))
+                        ->searchable(),
 
                     ])
+                    ->columns(5)
 
 
 
@@ -73,7 +96,10 @@ class PurchaseResource extends Resource
     {
         return $table
             ->columns([
-                //
+
+                TextColumn::make('id')->sortable(),
+                TextColumn::make('provider.name')->sortable()->searchable(),
+
             ])
             ->filters([
                 //

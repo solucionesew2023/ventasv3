@@ -20,7 +20,6 @@ return new class extends Migration
             $table->foreign('purchase_id')->references('id')->on('purchases');
             $table->float('purchase_price');
             $table->integer('quantity');
-            $table->float('subtotal');
             $table->text('color');
             $table->text('size');
 
