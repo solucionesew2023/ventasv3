@@ -51,62 +51,52 @@ class PurchaseResource extends Resource
                             Select::make('provider_id')->label('Provaider')
                         ->options(Provider::all()->pluck('name', 'id'))
                         ->searchable(),
-                        DatePicker::make('purchase_date')->required(),
+                        DatePicker::make('purchase_date')->required()->maxDate(now()),
                         TextInput::make('invoice_number')->required(),
-                        Select::make('status')->required()
-                                ->options([
-                                    'payable' => 'Payable',
-                                    'paid' => 'Paid',
-                                    'pass' => 'pass' ]),
+                        Select::make('state')->required()
+                                ->options(config('statepay.states')),
                                     TextInput::make('total')->numeric()
                                     ->required()
                                     ->minValue(1),
                                 ]),
-                     Fieldset::make('Purchase detail')
-                    ->schema([
 
 
-                        Select::make('product_ida')->label('Product')
-                        ->required()
-                        ->options(Product::all()->pluck('name', 'id'))
-                        ->searchable(),
-                        TextInput::make('product_pricea')->numeric()
-                                    ->required()
-                                    ->minValue(1),
-                        TextInput::make('product_amounta')->numeric()
-                                    ->required()
-                                    ->minValue(1),
-                        Select::make('colora')->label('Color')
-                        ->required()
-                        ->options(Color::all()->pluck('name', 'id'))
-                        ->searchable(),
-                        Select::make('sizea')->label('Size')
-                        ->required()
-                        ->options(Size::all()->pluck('name', 'id'))
-                        ->searchable()
-                        ->reactive()
-                        ->afterStateUpdated(fn ($state, callable $set)=> $set('product_id','product_ida'))
+                                Fieldset::make('Detail')
+                                ->schema([
+                                    Repeater::make('Product_purchases')
+                                    ->relationship()
+
+                                    ->schema([
+                                        Select::make('product_id')->label('Product')
+                                        ->required()
+                                        ->options(Product::all()->pluck('name', 'id'))
+                                        ->searchable(),
+                                        TextInput::make('product_price')->numeric()
+                                                    ->required()
+                                                    ->minValue(1),
+                                        TextInput::make('product_amount')->numeric()
+                                                    ->required()
+                                                    ->minValue(1),
+                                        Select::make('color')->label('Color')
+                                        ->required()
+                                        ->options(Color::all()->pluck('name', 'id'))
+                                        ->searchable(),
+                                        Select::make('size')->label('Size')
+                                        ->required()
+                                        ->options(Size::all()->pluck('name', 'id'))
+                                        ->searchable(),
+
+                                    ])
+                                    ->columns(5)
 
 
-
-                        ,
-
-                Repeater::make('Product_purchases')
-                        ->relationship()
-
-                        ->schema([
-                            TextInput::make('product_id')->disabled(),
-                            TextInput::make('purchase_price')->disabled(),
-                            TextInput::make('product_amount')->disabled(),
-                            TextInput::make('color')->disabled(),
-                            TextInput::make('size')->disabled(),
-
-                        ])
+                                ])->columns(1)
 
 
 
-                    ])
-                    ->columns(5)
+
+
+
 
 
 

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->integer('product_amount');
             $table->text('color');
             $table->text('size');
-      
+            $table->timestamps();
 
         });
     }
