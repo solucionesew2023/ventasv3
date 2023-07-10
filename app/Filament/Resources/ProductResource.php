@@ -11,6 +11,7 @@ use App\Models\Color;
 use App\Models\Size;
 use App\Models\Tax;
 use App\Models\Brand;
+use App\Models\Image;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -32,7 +33,7 @@ class ProductResource extends Resource
     protected static ?string $model = Product::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-gift';
-    protected static ?string $navigationGroup='Productos';
+    protected static ?string $navigationGroup='Products';
     protected static ?int $navigationSort = 7;
 
     public static function form(Form $form): Form
@@ -82,10 +83,18 @@ class ProductResource extends Resource
                  ->schema([
                     RichEditor::make('description')->required(),
                  ])->columns(1),
-        FileUpload::make('image')->image()
+        //para se puede ver el archico al usuario final se debe ejecutar el comando pa storage:link
+        FileUpload::make('imagesproduct')->image()
+
+
                                 ->multiple()
+                                ->directory('product-images')
+                                ->storeFileNamesIn('ori-imagesproduct')
+                                ->enableReordering()
                                 ->imageResizeTargetWidth('1920')
-                                ->imageResizeTargetHeight('1080'),
+                                ->imageResizeTargetHeight('1080')
+                                ->enableDownload()
+                                ->enableOpen(),
 
             ]);
     }

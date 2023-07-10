@@ -17,8 +17,15 @@ class Product extends Model
         'slug',
         'description',
         'stock_min',
-        'status'
+        'status',
+        'imagesproduct',
+        'ori-imagesproduct'
             ];
+    protected $casts=[
+        'imagesproduct'=>'array',
+        'ori-imagesproduct'=>'array',
+
+    ];
 
     public function subcategory(){
         //relacion inversa con subcategorias
@@ -45,7 +52,7 @@ class Product extends Model
         return $this->belongsToMany(Size::class)->withPivot('quantity','purchase_price','profit_percentage');
 
     }
-    
+
 
 
     //Relacion uno a muchos entre productos e imagenes

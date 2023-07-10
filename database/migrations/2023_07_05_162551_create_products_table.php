@@ -27,6 +27,8 @@ return new class extends Migration
             $table->text('description');
             $table->integer('stock_min');
             $table->text('status');
+            $table->text('imagesproduct')->nullable();
+            $table->text('ori-imagesproduct')->nullable();
             $table->timestamps();
         });
     }
