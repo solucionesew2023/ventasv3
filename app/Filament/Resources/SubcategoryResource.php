@@ -25,7 +25,7 @@ class SubcategoryResource extends Resource
     protected static ?string $model = Subcategory::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-newspaper';
-    protected static ?string $navigationGroup='Productos';
+    protected static ?string $navigationGroup='Products';
     protected static ?int $navigationSort = 2;
     protected static ?string $inverseRelationship = 'category';
 
@@ -69,7 +69,7 @@ class SubcategoryResource extends Resource
     public static function getRelations(): array
     {
         return [
-           
+
         ];
     }
 
