@@ -61,7 +61,7 @@ class PurchaseResource extends Resource
                                 ]),
 
 
-                                Fieldset::make('Detail')
+                                Fieldset::make('Detail product')
                                 ->schema([
                                     Repeater::make('Product_purchases')
                                     ->relationship()
