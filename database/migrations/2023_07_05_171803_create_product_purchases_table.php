@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('purchase_id')->constrained()->onDelete('cascade');
             $table->float('product_price');
             $table->integer('product_amount');
+            $table->double('subtotal');
             $table->text('color');
             $table->text('size');
             $table->timestamps();

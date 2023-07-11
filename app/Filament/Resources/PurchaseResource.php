@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Filament\Resources;
-
+use Filament\Forms\Components\Section;
 use App\Filament\Resources\PurchaseResource\Pages;
 use App\Filament\Resources\PurchaseResource\RelationManagers;
 use App\Models\Purchase;
@@ -37,8 +37,6 @@ class PurchaseResource extends Resource
     {
         return $form
             ->schema([
-
-
                 Grid::make([
                     'default' => 1,
                     'sm' => 5,
@@ -48,7 +46,7 @@ class PurchaseResource extends Resource
                     '2xl' => 5,
                 ])
                     ->schema([
-                            Select::make('provider_id')->label('Provaider')
+                        Select::make('provider_id')->label('Provaider')
                         ->options(Provider::all()->pluck('name', 'id'))
                         ->searchable(),
                         DatePicker::make('purchase_date')->required()->maxDate(now()),
@@ -59,13 +57,11 @@ class PurchaseResource extends Resource
                                     ->required()
                                     ->minValue(1),
                                 ]),
-
-
-                                Fieldset::make('Detail product')
+                                Section::make('Detail')
                                 ->schema([
+
                                     Repeater::make('Product_purchases')
                                     ->relationship()
-
                                     ->schema([
                                         Select::make('product_id')->label('Product')
                                         ->required()
@@ -76,21 +72,45 @@ class PurchaseResource extends Resource
                                                     ->minValue(1),
                                         TextInput::make('product_amount')->numeric()
                                                     ->required()
-                                                    ->minValue(1),
+                                                    ->minValue(1)
+                                                    ->reactive()
+                                                    ->afterStateUpdated(function($state, callable  $set){
+
+                                                        $set('subtotal', $state);
+
+
+
+                                                    })
+
+
+
+
+                                                    ,
+
+
+
+                                         TextInput::make('subtotal')
+                                                    ->disabled()
+                                                    ->numeric()
+                                                    ->mask(fn (TextInput\Mask $mask) => $mask
+                                                    ->numeric()
+                                                    ->thousandsSeparator(','),
+                                                    ),
                                         Select::make('color')->label('Color')
                                         ->required()
-                                        ->options(Color::all()->pluck('name', 'id'))
+                                        ->options(Color::all()->pluck('name', 'name'))
                                         ->searchable(),
                                         Select::make('size')->label('Size')
                                         ->required()
-                                        ->options(Size::all()->pluck('name', 'id'))
+                                        ->options(Size::all()->pluck('name', 'name'))
                                         ->searchable(),
 
                                     ])
-                                    ->columns(5)
+                                    ->columns(6)
+                                ])
+                                ->columns(1)
 
 
-                                ])->columns(1)
 
 
 
