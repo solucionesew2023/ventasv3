@@ -9,6 +9,7 @@ use App\Models\Provider;
 use App\Models\Product;
 use App\Models\Color;
 use App\Models\Size;
+use Closure;
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -53,7 +54,7 @@ class PurchaseResource extends Resource
                         TextInput::make('invoice_number')->required(),
                         Select::make('state')->required()
                                 ->options(config('statepay.states')),
-                                    TextInput::make('total')->numeric()
+                        TextInput::make('total')->numeric()
                                     ->required()
                                     ->minValue(1),
                                 ]),
@@ -69,38 +70,29 @@ class PurchaseResource extends Resource
                                         ->searchable(),
                                         TextInput::make('product_price')->numeric()
                                                     ->required()
-                                                    ->minValue(1),
-                                        TextInput::make('product_amount')->numeric()
+                                                    ->minValue(1)
+                                                    ->reactive()
+                        ->afterStateUpdated(function(Closure  $set, $get){
+
+                            $set('subtotal', $get('product_price') * $get('product_amount'));
+                            $set('total', $get('product_price') * $get('product_amount'));
+                           }),
+                        TextInput::make('product_amount')->numeric()
                                                     ->required()
                                                     ->minValue(1)
                                                     ->reactive()
-                                                    ->afterStateUpdated(function($state, callable  $set){
+                        ->afterStateUpdated(function(Closure  $set, $get){
+                            $set('subtotal', $get('product_price') * $get('product_amount'));
+                            $set('total', $get('product_price') * $get('product_amount'));
+                           }),
 
-                                                        $set('subtotal', $state);
-
-
-
-                                                    })
-
-
-
-
-                                                    ,
-
-
-
-                                         TextInput::make('subtotal')
-                                                    ->disabled()
-                                                    ->numeric()
-                                                    ->mask(fn (TextInput\Mask $mask) => $mask
-                                                    ->numeric()
-                                                    ->thousandsSeparator(','),
-                                                    ),
-                                        Select::make('color')->label('Color')
+                        TextInput::make('subtotal')
+                                                    ->disabled(),
+                        Select::make('color')->label('Color')
                                         ->required()
                                         ->options(Color::all()->pluck('name', 'name'))
                                         ->searchable(),
-                                        Select::make('size')->label('Size')
+                        Select::make('size')->label('Size')
                                         ->required()
                                         ->options(Size::all()->pluck('name', 'name'))
                                         ->searchable(),
