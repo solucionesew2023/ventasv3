@@ -13,7 +13,9 @@ class Product_purchases extends Model
             'product_id',
             'product_price',
             'product_amount',
-            'color','size'
+            'subtotal',
+            'color',
+            'size'
                         ];
 
 }
