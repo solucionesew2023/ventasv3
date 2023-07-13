@@ -29,22 +29,15 @@ class Purchase extends Model
     }
 
 
-public function Product_purchases(): HasMany
+public function product_purchases(): HasMany
 {
     return $this->hasmany(Product_purchases::class);
 }
 
-/*
-    public function products(){
-        //relacion muchos a muchos productos compras
-        return $this->belongsToMany(Product::class)->withPivot(
-                                                        'quantity',
-                                                        'purchase_price',
-                                                        'subtotal',
-                                                        'color',
-                                                        'size');
+public function creditpurchases(): HasMany
+{
+    return $this->hasmany(Creditpurchase::class);
+}
 
-    }
 
-    */
 }

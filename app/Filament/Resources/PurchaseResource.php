@@ -61,7 +61,7 @@ class PurchaseResource extends Resource
                                 Section::make('Detail')
                                 ->schema([
 
-                                    Repeater::make('Product_purchases')
+                                    Repeater::make('product_purchases')
                                     ->relationship()
                                     ->schema([
                                         Select::make('product_id')->label('Product')

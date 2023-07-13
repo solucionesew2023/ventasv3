@@ -1,9 +1,7 @@
 <?php
-
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
-
 return new class extends Migration
 {
     /**
@@ -14,8 +12,10 @@ return new class extends Migration
         Schema::create('creditpurchases', function (Blueprint $table) {
             $table->id();
             $table->foreignId('purchase_id')->constrained()->onDelete('cascade');
-            $table->double('credit');
-            
+            $table->text('typepay');
+            $table->double('valuepay');
+            $table->text('notes');
+            $table->text('evidence')->nullable();
             $table->timestamps();
         });
     }

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Product extends Model
 {
@@ -40,8 +41,6 @@ class Product extends Model
         return $this->belongsTo(Brand::class);
     }
 
-
-
     public function colors(){
         //relacion muchos a muchos productos colores
         return $this->belongsToMany(Color::class)->withPivot('quantity','purchase_price','profit_percentage');
@@ -53,12 +52,8 @@ class Product extends Model
 
     }
 
-
-
     //Relacion uno a muchos entre productos e imagenes
-  public function images(){
-    return $this->hasMany(Image::class);
-}
+
 public function productQuantity(): HasOne
     {
         return $this->hasOne(ProductQuantity::class);
