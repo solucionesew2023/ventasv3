@@ -45,13 +45,13 @@ class CreditpurchaseResource extends Resource
                 TextInput::make('balance')->required(),
 
                 DatePicker::make('payment_date')->required()->maxDate(now()),
-                Select::make('typepay')
+                Select::make('type_pay')
                         ->options([
                             'effective' => 'Effective',
                             'transfer' => 'Transfer',
                             'cheque' => 'Cheque',
                         ]),
-                        TextInput::make('valuepay')->required(),
+                        TextInput::make('value_pay')->required(),
                         Card::make()
                  ->schema([
                     RichEditor::make('notes')->required(),

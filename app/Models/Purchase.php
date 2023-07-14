@@ -21,7 +21,8 @@ class Purchase extends Model
         'invoice_number',
         'state',
         'total',
-        'balance'
+        'balance',
+        'payment_method'
     ];
 
     public function provider(): BeLongsTo{

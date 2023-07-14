@@ -19,6 +19,8 @@ return new class extends Migration
             $table->string('state');
             $table->double('total');
             $table->double('balance');
+            $table->string('payment_method')->nullable();
+
             $table->timestamps();
         });
     }

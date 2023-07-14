@@ -13,8 +13,8 @@ class Creditpurchase extends Model
     protected $fillable = [
         'purchase_id',
         'payment_date',
-        'typepay',
-        'valuepay',
+        'type_pay',
+        'value_pay',
         'notes',
         'evidence'
             ];

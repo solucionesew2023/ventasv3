@@ -13,8 +13,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('purchase_id')->constrained()->onDelete('cascade');
             $table->date('payment_date');
-            $table->text('typepay');
-            $table->double('valuepay');
+            $table->text('type_pay');
+            $table->double('value_pay');
             $table->text('notes')->nullable();
             $table->text('evidence')->nullable();
             $table->timestamps();
