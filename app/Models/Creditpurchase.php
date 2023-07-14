@@ -11,9 +11,9 @@ class Creditpurchase extends Model
     use HasFactory;
 
     protected $fillable = [
-        'id',
-        'typepay',
         'purchase_id',
+        'payment_date',
+        'typepay',
         'valuepay',
         'notes',
         'evidence'

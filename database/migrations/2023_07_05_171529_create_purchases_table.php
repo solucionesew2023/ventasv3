@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('invoice_number');
             $table->string('state');
             $table->double('total');
+            $table->double('balance');
             $table->timestamps();
         });
     }

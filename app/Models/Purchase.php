@@ -20,7 +20,8 @@ class Purchase extends Model
         'purchase_date',
         'invoice_number',
         'state',
-        'total'
+        'total',
+        'balance'
     ];
 
     public function provider(): BeLongsTo{

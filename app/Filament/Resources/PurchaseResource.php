@@ -40,11 +40,11 @@ class PurchaseResource extends Resource
             ->schema([
                 Grid::make([
                     'default' => 1,
-                    'sm' => 5,
-                    'md' => 5,
-                    'lg' => 5,
-                    'xl' => 5,
-                    '2xl' => 5,
+                    'sm' => 6,
+                    'md' => 6,
+                    'lg' => 6,
+                    'xl' => 6,
+                    '2xl' => 6,
                 ])
                     ->schema([
                         Select::make('provider_id')->label('Provaider')
@@ -57,6 +57,9 @@ class PurchaseResource extends Resource
                         TextInput::make('total')->numeric()
                                     ->required()
                                     ->minValue(1),
+                        TextInput::make('balance')->numeric()
+                                    ->required()
+                                    ->minValue(1)
                                 ]),
                                 Section::make('Detail')
                                 ->schema([

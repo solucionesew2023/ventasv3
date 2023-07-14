@@ -12,11 +12,13 @@ return new class extends Migration
         Schema::create('creditpurchases', function (Blueprint $table) {
             $table->id();
             $table->foreignId('purchase_id')->constrained()->onDelete('cascade');
+            $table->date('payment_date');
             $table->text('typepay');
             $table->double('valuepay');
-            $table->text('notes');
+            $table->text('notes')->nullable();
             $table->text('evidence')->nullable();
             $table->timestamps();
+
         });
     }
 
