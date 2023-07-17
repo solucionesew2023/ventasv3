@@ -9,6 +9,7 @@ use App\Models\Provider;
 use App\Models\Product;
 use App\Models\Color;
 use App\Models\Size;
+
 use Closure;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -26,6 +27,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\FileUpload;
+
 
 class PurchaseResource extends Resource
 {
@@ -40,11 +43,11 @@ class PurchaseResource extends Resource
             ->schema([
                 Grid::make([
                     'default' => 1,
-                    'sm' => 6,
-                    'md' => 6,
-                    'lg' => 6,
-                    'xl' => 6,
-                    '2xl' => 6,
+                    'sm' => 4,
+                    'md' => 4,
+                    'lg' => 4,
+                    'xl' => 4,
+                    '2xl' => 4,
                 ])
                     ->schema([
                         Select::make('provider_id')->label('Provaider')
@@ -54,12 +57,7 @@ class PurchaseResource extends Resource
                         TextInput::make('invoice_number')->required(),
                         Select::make('state')->required()
                                 ->options(config('statepay.states')),
-                        TextInput::make('total')->numeric()
-                                    ->required()
-                                    ->minValue(1),
-                        TextInput::make('balance')->numeric()
-                                    ->required()
-                                    ->minValue(1)
+
                                 ]),
                                 Section::make('Detail')
                                 ->schema([
@@ -102,8 +100,47 @@ class PurchaseResource extends Resource
 
                                     ])
                                     ->columns(6)
+
+
+
+
+
+                                ])
+                                ->columns(1),
+
+                                Section::make('Detail')
+                                ->schema([
+
+                                    Repeater::make('invoice_payments')
+                                    ->schema([
+                                        DatePicker::make('payment_date')->required()->maxDate(now()),
+                                        Select::make('payment_method')
+                                                ->options([
+                                                    'effective' => 'Effective',
+                                                    'transfer' => 'Transfer',
+                                                    'cheque' => 'Cheque',
+                                                ]),
+                                                TextInput::make('note')->required(),
+                                                TextInput::make('value_pay')->required(),
+                                         FileUpload::make('evidence'),
+
+                                    ])->columns(5)
+                                    ->createItemButtonLabel('Add Invoice payments'),
+
+
+                                    TextInput::make('total')->numeric()
+                                    ->required()
+                                    ->minValue(1),
+                        TextInput::make('balance')->numeric()
+                                    ->required()
+                                    ->minValue(1)
+
                                 ])
                                 ->columns(1)
+
+
+
+
 
 
 
