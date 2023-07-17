@@ -99,7 +99,10 @@ class PurchaseResource extends Resource
                                         ->searchable(),
 
                                     ])
-                                    ->columns(6)
+                                    ->columns(6),
+                                    TextInput::make('total')->numeric()
+                                    ->required()
+                                    ->minValue(1),
 
 
 
@@ -110,8 +113,7 @@ class PurchaseResource extends Resource
 
                                 Section::make('Detail')
                                 ->schema([
-
-                                    Repeater::make('invoice_payments')
+                                  Repeater::make('invoice_payments')
                                     ->schema([
                                         DatePicker::make('payment_date')->required()->maxDate(now()),
                                         Select::make('payment_method')
@@ -120,20 +122,20 @@ class PurchaseResource extends Resource
                                                     'transfer' => 'Transfer',
                                                     'cheque' => 'Cheque',
                                                 ]),
-                                                TextInput::make('note')->required(),
-                                                TextInput::make('value_pay')->required(),
-                                         FileUpload::make('evidence'),
+                                      TextInput::make('value_pay')->required(),
+                                      TextInput::make('note')->required(),
+                                      FileUpload::make('evidence')
+                                      ->directory('evidence_payment')
+                                      ->enableReordering()
+                                      ->enableDownload()
+                                      ->enableOpen(),
 
                                     ])->columns(5)
                                     ->createItemButtonLabel('Add Invoice payments'),
 
-
-                                    TextInput::make('total')->numeric()
-                                    ->required()
-                                    ->minValue(1),
                         TextInput::make('balance')->numeric()
                                     ->required()
-                                    ->minValue(1)
+                                    ->minValue(0)
 
                                 ])
                                 ->columns(1)
@@ -167,6 +169,7 @@ class PurchaseResource extends Resource
                 TextColumn::make('state')->sortable()->searchable(),
                 TextColumn::make('invoice_number')->sortable()->searchable(),
                 TextColumn::make('total')->sortable()->searchable(),
+                TextColumn::make('balance')->sortable()->searchable(),
             ])
             ->filters([
                 //

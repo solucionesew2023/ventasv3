@@ -20,10 +20,15 @@ class Purchase extends Model
         'purchase_date',
         'invoice_number',
         'state',
+        'invoice_payments',
         'total',
         'balance',
-        'payment_method'
+
     ];
+    protected $casts=[
+        'invoice_payments'=>'json',
+    ];
+
 
     public function provider(): BeLongsTo{
         //relacion inversa con proveedores

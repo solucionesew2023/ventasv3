@@ -17,9 +17,9 @@ return new class extends Migration
             $table->date('purchase_date');
             $table->string('invoice_number');
             $table->string('state');
+            $table->json('invoice_payments')->nullable();
             $table->double('total');
             $table->double('balance');
-            $table->json('invoice_payments')->nullable();
             $table->timestamps();
         });
     }
