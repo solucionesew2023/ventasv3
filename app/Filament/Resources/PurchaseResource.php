@@ -28,6 +28,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Placeholder;
 
 
 class PurchaseResource extends Resource
@@ -76,7 +77,9 @@ class PurchaseResource extends Resource
                         ->afterStateUpdated(function(Closure  $set, $get){
 
                             $set('subtotal', $get('product_price') * $get('product_amount'));
-                            $set('total', $get('product_price') * $get('product_amount'));
+
+                            $set('total', $get('repeater.subtotal'));
+
                            }),
                         TextInput::make('product_amount')->numeric()
                                                     ->required()
@@ -123,7 +126,14 @@ class PurchaseResource extends Resource
                                                     'cheque' => 'Cheque',
                                                 ]),
                                       TextInput::make('value_pay')->required(),
-                                      TextInput::make('note')->required(),
+
+
+
+                                      TextInput::make('note')->required()
+                                                ->Placeholder('Check number, bank, etc'),
+
+
+
                                       FileUpload::make('evidence')
                                       ->directory('evidence_payment')
                                       ->enableReordering()
