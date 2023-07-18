@@ -29,6 +29,7 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
+use Filament\Forms\Components\Hidden;
 
 
 class PurchaseResource extends Resource
@@ -38,8 +39,11 @@ class PurchaseResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-inbox-in';
      protected static ?string $navigationGroup='Shopping';
 
+
+
     public static function form(Form $form): Form
     {
+
         return $form
             ->schema([
                 Grid::make([
@@ -77,7 +81,8 @@ class PurchaseResource extends Resource
                         ->afterStateUpdated(function(Closure  $set, $get){
 
                             $set('subtotal', $get('product_price') * $get('product_amount'));
-                            $set('total', $get('product_price') * $get('product_amount'));
+                            $set('../../total',  $get('subtotal')+ $get('../../stotal'));
+                            $set('../../stotal', $get('product_price') * $get('product_amount'));
                            }),
                         TextInput::make('product_amount')->numeric()
                                                     ->required()
@@ -85,7 +90,9 @@ class PurchaseResource extends Resource
                                                     ->reactive()
                         ->afterStateUpdated(function(Closure  $set, $get){
                             $set('subtotal', $get('product_price') * $get('product_amount'));
-                            $set('total', $get('product_price') * $get('product_amount'));
+                            $set('../../total',  $get('subtotal')+ $get('../../stotal'));
+                            $set('../../stotal', $get('product_price') * $get('product_amount'));
+
                            }),
 
                         TextInput::make('subtotal')
@@ -101,9 +108,12 @@ class PurchaseResource extends Resource
 
                                     ])
                                     ->columns(6),
-                                    TextInput::make('total')->numeric()
+
+
+                                    TextInput::make('total')
                                     ->required()
                                     ->minValue(1),
+                                    Hidden::make('stotal'),
 
 
 
