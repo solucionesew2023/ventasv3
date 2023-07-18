@@ -85,8 +85,6 @@ class ProductResource extends Resource
                  ])->columns(1),
         //para se puede ver el archico al usuario final se debe ejecutar el comando pa storage:link
         FileUpload::make('imagesproduct')->image()
-
-
                                 ->multiple()
                                 ->directory('product-images')
                                 ->storeFileNamesIn('ori-imagesproduct')
