@@ -23,7 +23,9 @@ class Product extends Model
         'ori-imagesproduct'
             ];
     protected $casts=[
+        
         'imagesproduct'=>'array',
+
         'ori-imagesproduct'=>'array',
 
     ];

@@ -78,6 +78,7 @@ class PurchaseResource extends Resource
                         ->afterStateUpdated(function(Closure  $set, $get){
 
                             $set('subtotal', $get('product_price') * $get('product_amount'));
+                            
                             $set('total', $get('product_price') * $get('product_amount'));
                            }),
                         TextInput::make('product_amount')->numeric()
