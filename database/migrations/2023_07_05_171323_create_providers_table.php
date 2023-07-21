@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('city_id');
             $table->foreign('city_id')->references('id')->on('cities');
+            $table->foreignId('typeprovider_id')->constrained()->onDelete('cascade');
             $table->text('name');
             $table->text('nit');
             $table->text('email');

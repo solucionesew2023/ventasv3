@@ -11,6 +11,7 @@ class Provider extends Model
 
     protected $fillable=[
         'city_id',
+        'typeprovider_id',
         'name',
         'nit',
         'email',
@@ -26,5 +27,9 @@ class Provider extends Model
     //relacion inversa con ciudades
     public function city(){
         return $this->belongsTo(City::class);
+    }
+
+    public function typeprovider(){
+        return $this->belongsTo(Typeprovider::class);
     }
 }

@@ -5,6 +5,8 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\ProviderResource\Pages;
 use App\Filament\Resources\ProviderResource\RelationManagers;
 use App\Models\Provider;
+use App\Models\Typeprovider;
+
 use Filament\Forms;
 use Filament\Resources\Form;
 use Filament\Resources\Resource;
@@ -34,6 +36,9 @@ class ProviderResource extends Resource
             ->schema([
                 TextInput::make('name')->required()
                 ->unique(ignoreRecord:true),
+                Select::make('typeprovider_id')->label('Type Provider')
+                ->options(Typeprovider::all()->pluck('name', 'id'))
+                ->searchable(),
                 TextInput::make('nit')->required()
                 ->unique(ignoreRecord:true),
                 TextInput::make('email')->required()
@@ -104,7 +109,9 @@ class ProviderResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+
+
+
         ];
     }
 

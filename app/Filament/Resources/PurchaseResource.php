@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Filament\Resources;
 use Filament\Forms\Components\Section;
 use App\Filament\Resources\PurchaseResource\Pages;
@@ -9,7 +8,6 @@ use App\Models\Provider;
 use App\Models\Product;
 use App\Models\Color;
 use App\Models\Size;
-
 use Closure;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -31,7 +29,6 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Hidden;
 
-
 class PurchaseResource extends Resource
 {
     protected static ?string $model = Purchase::class;
@@ -39,11 +36,8 @@ class PurchaseResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-inbox-in';
      protected static ?string $navigationGroup='Shopping';
 
-
-
     public static function form(Form $form): Form
     {
-
         return $form
             ->schema([
                 Grid::make([
@@ -67,7 +61,10 @@ class PurchaseResource extends Resource
                                 Section::make('Detail')
                                 ->schema([
 
+
+
                                     Repeater::make('product_purchases')
+
                                     ->relationship()
                                     ->schema([
                                         Select::make('product_id')->label('Product')
@@ -77,21 +74,27 @@ class PurchaseResource extends Resource
                                         TextInput::make('product_price')->numeric()
                                                     ->required()
                                                     ->minValue(1)
-                                                    ->reactive()
+                                                   /* ->reactive()
                         ->afterStateUpdated(function(Closure  $set, $get){
 
                             $set('subtotal', $get('product_price') * $get('product_amount'));
-                            $set('../../total',  $get('subtotal')+ $get('../../stotal'));
-                            $set('../../stotal', $get('product_price') * $get('product_amount'));
-                           }),
+
+                           // $set('../../total',  $get('subtotal')+ $get('../../stotal'));
+
+
+
+                           })*/,
+
                         TextInput::make('product_amount')->numeric()
                                                     ->required()
                                                     ->minValue(1)
-                                                    ->reactive()
+                                                   ->reactive()
                         ->afterStateUpdated(function(Closure  $set, $get){
                             $set('subtotal', $get('product_price') * $get('product_amount'));
-                            $set('../../total',  $get('subtotal')+ $get('../../stotal'));
-                            $set('../../stotal', $get('product_price') * $get('product_amount'));
+
+                            //$set('../../total',  $get('subtotal')+ $get('../../stotal'));
+
+                           // $set('../../stotal', $get('product_price') * $get('product_amount'));
 
                            }),
 
@@ -110,10 +113,16 @@ class PurchaseResource extends Resource
                                     ->columns(6),
 
 
+
                                     TextInput::make('total')
-                                    ->required()
-                                    ->minValue(1),
-                                    Hidden::make('stotal'),
+
+                                    ->afterStateUpdated(function ($get) {
+                                        return collect($get('product_purchases'))
+                                            ->pluck('subtotal')
+                                            ->sum();
+                                    }),
+
+
 
 
 
@@ -121,7 +130,6 @@ class PurchaseResource extends Resource
 
                                 ])
                                 ->columns(1),
-
                                 Section::make('Detail')
                                 ->schema([
                                   Repeater::make('invoice_payments')
@@ -134,9 +142,6 @@ class PurchaseResource extends Resource
                                                     'cheque' => 'Cheque',
                                                 ]),
                                       TextInput::make('value_pay')->required(),
-
-
-
                                       TextInput::make('note')->required()
                                                 ->Placeholder('Check number, bank, etc'),
 
@@ -157,19 +162,6 @@ class PurchaseResource extends Resource
 
                                 ])
                                 ->columns(1)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
             ]);
