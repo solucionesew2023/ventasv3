@@ -134,6 +134,12 @@ class PurchaseResource extends Resource
 
 
                         TableRepeater::make('invoice_payments')
+                        ->columnWidths([
+                            'value_pay' => '150px',
+                            'payment_date' => '200px',
+                            'payment_method' => '200px',
+                            'note' => '300px',
+                        ])
 
                                     ->schema([
                                         DatePicker::make('payment_date')->required()->maxDate(now())
