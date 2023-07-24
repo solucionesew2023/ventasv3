@@ -8,6 +8,7 @@ use App\Models\Purchase;
 use App\Models\Provider;
 use App\Models\Product;
 use App\Models\Color;
+use App\Models\tax;
 use App\Models\Size;
 use Closure;
 use Filament\Forms;
@@ -62,7 +63,7 @@ class PurchaseResource extends Resource
                         TableRepeater::make('product_purchases')
                         ->columnWidths([
                             'subtotal' => '150px',
-                            'product_amount' => '100px',
+                            'product_amount' => '90px',
                             'product_price' => '100px',
                             'iva' => '100px',
                         ])
@@ -73,24 +74,46 @@ class PurchaseResource extends Resource
                                         ->disableLabel()
                                         ->required()
                                         ->options(Product::all()->pluck('name', 'id'))
-                                        ->searchable(),
+                                        ->searchable()
+                                        ->reactive()
+                                        ->afterStateUpdated(function($state, callable $set){
+                                            $product=Product::find($state);
+                                            $set('iva_p', $product->tax->value);
+
+
+                                        }),
+
                                         Select::make('color')->label('Color')
                                         ->disableLabel()
                                         ->required()
-                                                        ->options(Color::all()->pluck('name', 'name'))
-                                                        ->searchable(),
+                                        ->options(Color::all()->pluck('name', 'name'))
+                                        ->searchable(),
                                         Select::make('size')->label('Size')
                                         ->disableLabel()
                                         ->required()
-                                                        ->options(Size::all()->pluck('name', 'name'))
-                                                        ->searchable(),
+                                        ->options(Size::all()->pluck('name', 'name'))
+                                        ->searchable(),
+
                                         TextInput::make('product_price')->numeric()
                                         ->disableLabel()
                                         ->required()
-                                                    ->minValue(1)
-                                                   ->reactive()
-                                                   ->afterStateUpdated(function(Closure  $set, $get){
-                                                    $set('subtotal', $get('product_price') * $get('product_amount'));
+                                        ->minValue(1)
+                                        ->reactive()
+                                        ->afterStateUpdated(function(Closure  $set, $get){
+                                                    $iva= $get('product_price') *
+                                                          $get('product_amount') *
+                                                          $get('iva_p');
+
+
+                                                    $set('iva', $iva);
+
+                                                    $set('subtotal',
+                                                     ( $get('product_price') *
+                                                      $get('product_amount')) +
+                                                      $get('iva'));
+
+
+
 
 
                                                    }),
@@ -100,11 +123,22 @@ class PurchaseResource extends Resource
                         ->required()
                                                     ->minValue(1)
                                                    ->reactive()
-                        ->afterStateUpdated(function(Closure  $set, $get){
-                            $set('subtotal', $get('product_price') * $get('product_amount'));
+                                                   ->afterStateUpdated(function(Closure  $set, $get){
+                                                    $iva= $get('product_price') *
+                                                          $get('product_amount') *
+                                                          $get('iva_p');
+
+
+                                                    $set('iva', $iva);
+
+                                                    $set('subtotal',
+                                                     ( $get('product_price') *
+                                                      $get('product_amount')) +
+                                                      $get('iva'));
 
 
                            }),
+                           Hidden::make('iva_p'),
                            TextInput::make('iva')
                            ->disableLabel()
                                                      ->disabled(),
