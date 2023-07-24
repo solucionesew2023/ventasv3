@@ -58,7 +58,7 @@ class PurchaseResource extends Resource
                                 ->options(config('statepay.states')),
 
                                 ]),
-                                Section::make('Detail')
+                                Section::make('Details')
                                 ->schema([
 
 
@@ -107,7 +107,7 @@ class PurchaseResource extends Resource
 
 
 
-                                    Placeholder::make("total")
+                                Placeholder::make("total")
                                 ->label("Total purchase")
                                 ->content(function ($get) {
                                     return collect($get('product_purchases'))
@@ -134,7 +134,10 @@ class PurchaseResource extends Resource
                                                     'transfer' => 'Transfer',
                                                     'cheque' => 'Cheque',
                                                 ]),
-                                      TextInput::make('value_pay')->required(),
+                                      TextInput::make('value_pay')->required()
+                                      ->reactive()
+
+                                      ,
                                       TextInput::make('note')->required()
                                                 ->Placeholder('Check number, bank, etc'),
 
@@ -149,16 +152,28 @@ class PurchaseResource extends Resource
                                     ])->columns(5)
                                     ->createItemButtonLabel('Add Invoice payments'),
 
-                                    Placeholder::make("Balance ")
+
+                                   Placeholder::make("balance")
                                     ->label("Total Balance")
                                     ->content(function ($get) {
-                                        return collect($get('product_purchases'))
-                                            ->pluck('subtotal')
-                                            ->sum();
-                                    }),
+
+                                        $val =collect($get('invoice_payments'))
+                                        ->pluck('value_pay')
+                                        ->sum();
+
+                                        $val2 =collect($get('product_purchases'))
+                                        ->pluck('subtotal')
+                                        ->sum();
+
+                                        return  $val2 - $val;
+                                        })
+
+
+
 
                                 ])
                                 ->columns(1)
+
 
 
             ]);
