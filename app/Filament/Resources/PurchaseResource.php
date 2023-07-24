@@ -1,5 +1,6 @@
 <?php
 namespace App\Filament\Resources;
+use Awcodes\FilamentTableRepeater\Components\TableRepeater;
 use Filament\Forms\Components\Section;
 use App\Filament\Resources\PurchaseResource\Pages;
 use App\Filament\Resources\PurchaseResource\RelationManagers;
@@ -58,21 +59,34 @@ class PurchaseResource extends Resource
                                 ->options(config('statepay.states')),
 
                                 ]),
-                                Section::make('Details')
-                                ->schema([
-
-
-
-                                    Repeater::make('product_purchases')
+                        TableRepeater::make('product_purchases')
+                        ->columnWidths([
+                            'subtotal' => '150px',
+                            'product_amount' => '100px',
+                            'product_price' => '100px',
+                            'iva' => '100px',
+                        ])
 
                                     ->relationship()
                                     ->schema([
                                         Select::make('product_id')->label('Product')
+                                        ->disableLabel()
                                         ->required()
                                         ->options(Product::all()->pluck('name', 'id'))
                                         ->searchable(),
+                                        Select::make('color')->label('Color')
+                                        ->disableLabel()
+                                        ->required()
+                                                        ->options(Color::all()->pluck('name', 'name'))
+                                                        ->searchable(),
+                                        Select::make('size')->label('Size')
+                                        ->disableLabel()
+                                        ->required()
+                                                        ->options(Size::all()->pluck('name', 'name'))
+                                                        ->searchable(),
                                         TextInput::make('product_price')->numeric()
-                                                    ->required()
+                                        ->disableLabel()
+                                        ->required()
                                                     ->minValue(1)
                                                    ->reactive()
                                                    ->afterStateUpdated(function(Closure  $set, $get){
@@ -82,7 +96,8 @@ class PurchaseResource extends Resource
                                                    }),
 
                         TextInput::make('product_amount')->numeric()
-                                                    ->required()
+                        ->disableLabel()
+                        ->required()
                                                     ->minValue(1)
                                                    ->reactive()
                         ->afterStateUpdated(function(Closure  $set, $get){
@@ -90,23 +105,25 @@ class PurchaseResource extends Resource
 
 
                            }),
-
+                           TextInput::make('iva')
+                           ->disableLabel()
+                                                     ->disabled(),
                         TextInput::make('subtotal')
+                          ->disableLabel()
                                                     ->disabled(),
-                        Select::make('color')->label('Color')
-                                        ->required()
-                                        ->options(Color::all()->pluck('name', 'name'))
-                                        ->searchable(),
-                        Select::make('size')->label('Size')
-                                        ->required()
-                                        ->options(Size::all()->pluck('name', 'name'))
-                                        ->searchable(),
+
 
                                     ])
-                                    ->columns(6),
+                                    ->columnSpan('full'),
 
 
-
+                                    Placeholder::make("iva_total")
+                                    ->label("Total iva")
+                                    ->content(function ($get) {
+                                        return collect($get('product_purchases'))
+                                            ->pluck('iva')
+                                            ->sum();
+                                    }),
                                 Placeholder::make("total")
                                 ->label("Total purchase")
                                 ->content(function ($get) {
@@ -116,40 +133,37 @@ class PurchaseResource extends Resource
                                 }),
 
 
+                        TableRepeater::make('invoice_payments')
 
-
-
-
-
-                                ])
-                                ->columns(1),
-                                Section::make('Detail')
-                                ->schema([
-                                  Repeater::make('invoice_payments')
                                     ->schema([
-                                        DatePicker::make('payment_date')->required()->maxDate(now()),
+                                        DatePicker::make('payment_date')->required()->maxDate(now())
+                                        ->disableLabel(),
                                         Select::make('payment_method')
                                                 ->options([
                                                     'effective' => 'Effective',
                                                     'transfer' => 'Transfer',
                                                     'cheque' => 'Cheque',
-                                                ]),
+                                                ])
+                                                ->disableLabel(),
                                       TextInput::make('value_pay')->required()
                                       ->reactive()
+                                      ->disableLabel()
 
                                       ,
                                       TextInput::make('note')->required()
+                                      ->disableLabel()
                                                 ->Placeholder('Check number, bank, etc'),
 
 
 
                                       FileUpload::make('evidence')
+                                      ->disableLabel()
                                       ->directory('evidence_payment')
                                       ->enableReordering()
                                       ->enableDownload()
                                       ->enableOpen(),
 
-                                    ])->columns(5)
+                                    ])->columnSpan('full')
                                     ->createItemButtonLabel('Add Invoice payments'),
 
 
@@ -168,11 +182,6 @@ class PurchaseResource extends Resource
                                         return  $val2 - $val;
                                         })
 
-
-
-
-                                ])
-                                ->columns(1)
 
 
 

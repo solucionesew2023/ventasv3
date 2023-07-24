@@ -21,6 +21,7 @@ class Purchase extends Model
         'invoice_number',
         'state',
         'invoice_payments',
+        'total_iva',
         'total',
         'balance',
 

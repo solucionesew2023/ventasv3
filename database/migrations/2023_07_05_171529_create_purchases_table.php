@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('invoice_number');
             $table->string('state');
             $table->json('invoice_payments')->nullable();
+            $table->double('total_iva');
             $table->double('total');
+
             $table->double('balance');
             $table->timestamps();
         });
