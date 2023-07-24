@@ -20,7 +20,6 @@ return new class extends Migration
             $table->json('invoice_payments')->nullable();
             $table->double('total_iva');
             $table->double('total');
-
             $table->double('balance');
             $table->timestamps();
         });

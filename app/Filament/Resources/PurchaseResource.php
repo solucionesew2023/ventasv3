@@ -64,16 +64,16 @@ class PurchaseResource extends Resource
                         ->columnWidths([
                             'subtotal' => '150px',
                             'product_amount' => '90px',
-                            'product_price' => '100px',
+                            'product_price' => '140px',
                             'iva' => '100px',
+                            'size' => '100px',
                         ])
-
-                                    ->relationship()
-                                    ->schema([
-                                        Select::make('product_id')->label('Product')
-                                        ->disableLabel()
-                                        ->required()
-                                        ->options(Product::all()->pluck('name', 'id'))
+                         ->relationship()
+                         ->schema([
+                         Select::make('product_id')->label('Product')
+                         ->disableLabel()
+                         ->required()
+                         ->options(Product::all()->pluck('name', 'id'))
                                         ->searchable()
                                         ->reactive()
                                         ->afterStateUpdated(function($state, callable $set){
@@ -151,14 +151,16 @@ class PurchaseResource extends Resource
                                     ->columnSpan('full'),
 
 
-                                    Placeholder::make("iva_total")
+                                    Placeholder::make("total_iva")
                                     ->label("Total iva")
                                     ->content(function ($get) {
                                         return collect($get('product_purchases'))
                                             ->pluck('iva')
                                             ->sum();
                                     }),
+
                                 Placeholder::make("total")
+                               
                                 ->label("Total purchase")
                                 ->content(function ($get) {
                                     return collect($get('product_purchases'))
