@@ -74,16 +74,12 @@ class PurchaseResource extends Resource
                                         TextInput::make('product_price')->numeric()
                                                     ->required()
                                                     ->minValue(1)
-                                                   /* ->reactive()
-                        ->afterStateUpdated(function(Closure  $set, $get){
-
-                            $set('subtotal', $get('product_price') * $get('product_amount'));
-
-                           // $set('../../total',  $get('subtotal')+ $get('../../stotal'));
+                                                   ->reactive()
+                                                   ->afterStateUpdated(function(Closure  $set, $get){
+                                                    $set('subtotal', $get('product_price') * $get('product_amount'));
 
 
-
-                           })*/,
+                                                   }),
 
                         TextInput::make('product_amount')->numeric()
                                                     ->required()
@@ -92,9 +88,6 @@ class PurchaseResource extends Resource
                         ->afterStateUpdated(function(Closure  $set, $get){
                             $set('subtotal', $get('product_price') * $get('product_amount'));
 
-                            //$set('../../total',  $get('subtotal')+ $get('../../stotal'));
-
-                           // $set('../../stotal', $get('product_price') * $get('product_amount'));
 
                            }),
 
@@ -114,13 +107,13 @@ class PurchaseResource extends Resource
 
 
 
-                                    TextInput::make('total')
-
-                                    ->afterStateUpdated(function ($get) {
-                                        return collect($get('product_purchases'))
-                                            ->pluck('subtotal')
-                                            ->sum();
-                                    }),
+                                    Placeholder::make("total")
+                                ->label("Total purchase")
+                                ->content(function ($get) {
+                                    return collect($get('product_purchases'))
+                                        ->pluck('subtotal')
+                                        ->sum();
+                                }),
 
 
 
@@ -156,9 +149,13 @@ class PurchaseResource extends Resource
                                     ])->columns(5)
                                     ->createItemButtonLabel('Add Invoice payments'),
 
-                        TextInput::make('balance')->numeric()
-                                    ->required()
-                                    ->minValue(0)
+                                    Placeholder::make("Balance ")
+                                    ->label("Total Balance")
+                                    ->content(function ($get) {
+                                        return collect($get('product_purchases'))
+                                            ->pluck('subtotal')
+                                            ->sum();
+                                    }),
 
                                 ])
                                 ->columns(1)
