@@ -58,8 +58,7 @@ class PurchaseResource extends Resource
                         TextInput::make('invoice_number')->required(),
                         Select::make('state')->required()
                                 ->options(config('statepay.states')),
-
-                                ]),
+                            ]),
                         TableRepeater::make('product_purchases')
                         ->columnWidths([
                             'subtotal' => '150px',
@@ -70,20 +69,26 @@ class PurchaseResource extends Resource
                         ])
                          ->relationship()
                          ->schema([
-                         Select::make('product_id')->label('Product')
+                        Select::make('product_id')->label('Product')
                          ->disableLabel()
                          ->required()
                          ->options(Product::all()->pluck('name', 'id'))
                                         ->searchable()
                                         ->reactive()
-                                        ->afterStateUpdated(function($state, callable $set){
+                                        ->afterStateUpdated(function($state, callable $set,$get){
                                             $product=Product::find($state);
+                                            
                                             $set('iva_p', $product->tax->value);
-
-
+                                            $iva= $get('product_price') *
+                                          $get('product_amount') *
+                                          $get('iva_p');
+                                          $set('iva', $iva);
+                                          $set('subtotal',
+                                          ( $get('product_price') *
+                                          $get('product_amount')) +
+                                          $get('iva'));
                                         }),
-
-                                        Select::make('color')->label('Color')
+                        Select::make('color')->label('Color')
                                         ->disableLabel()
                                         ->required()
                                         ->options(Color::all()->pluck('name', 'name'))
@@ -94,139 +99,115 @@ class PurchaseResource extends Resource
                                         ->options(Size::all()->pluck('name', 'name'))
                                         ->searchable(),
 
-                                        TextInput::make('product_price')->numeric()
+                      TextInput::make('product_price')->numeric()
                                         ->disableLabel()
                                         ->required()
                                         ->minValue(1)
                                         ->reactive()
                                         ->afterStateUpdated(function(Closure  $set, $get){
-                                                    $iva= $get('product_price') *
-                                                          $get('product_amount') *
-                                                          $get('iva_p');
-
-
-                                                    $set('iva', $iva);
-
-                                                    $set('subtotal',
-                                                     ( $get('product_price') *
-                                                      $get('product_amount')) +
-                                                      $get('iva'));
-
-
-
-
-
+                                          $iva= $get('product_price') *
+                                          $get('product_amount') *
+                                          $get('iva_p');
+                                          $set('iva', $iva);
+                                          $set('subtotal',
+                                          ( $get('product_price') *
+                                          $get('product_amount')) +
+                                          $get('iva'));
                                                    }),
-
-                        TextInput::make('product_amount')->numeric()
+                      TextInput::make('product_amount')->numeric()
                         ->disableLabel()
                         ->required()
-                                                    ->minValue(1)
-                                                   ->reactive()
-                                                   ->afterStateUpdated(function(Closure  $set, $get){
-                                                    $iva= $get('product_price') *
-                                                          $get('product_amount') *
-                                                          $get('iva_p');
-
-
-                                                    $set('iva', $iva);
-
-                                                    $set('subtotal',
-                                                     ( $get('product_price') *
-                                                      $get('product_amount')) +
-                                                      $get('iva'));
-
-
+                        ->minValue(1)
+                        ->reactive()
+                        ->afterStateUpdated(function(Closure  $set, $get){
+                                        $iva= $get('product_price') *
+                                        $get('product_amount') *
+                                        $get('iva_p');
+                                        $set('iva', $iva);
+                                        $set('subtotal',
+                                      ( $get('product_price') *
+                                        $get('product_amount')) +
+                                        $get('iva'));
                            }),
-                           Hidden::make('iva_p'),
-                           TextInput::make('iva')
+                       Hidden::make('iva_p'),
+                       TextInput::make('iva')
                            ->disableLabel()
-                                                     ->disabled(),
-                        TextInput::make('subtotal')
+                           ->disabled(),
+                       TextInput::make('subtotal')
                           ->disableLabel()
-                                                    ->disabled(),
+                          ->disabled(),
+                                    ])->columnSpan('full'),
+                 Placeholder::make("total_iva_purchase")
+                        ->label("Total iva purchase")
+                        ->content(function ($get,$set) {
+                            $valoriva = collect($get('product_purchases'))
+                                     ->pluck('iva')
+                                     ->sum();
+                            $set('total_iva',$valoriva );
+                             return $valoriva;
+                            }
+                            ),
+
+                  Placeholder::make("total_purchase")
+                            ->label("Total purchase")
+                            ->content(function ($get,$set) {
+                            $valort = collect($get('product_purchases'))
+                                     ->pluck('subtotal')
+                                     ->sum();
+                            $set('total',$valort );
+                             return $valort;
+                            }
+                            ),
+                  Hidden::make('total_iva')->disabled(),
+                  Hidden::make('total')->disabled(),
 
 
-                                    ])
-                                    ->columnSpan('full'),
-
-
-                                    Placeholder::make("total_iva")
-                                    ->label("Total iva")
-                                    ->content(function ($get) {
-                                        return collect($get('product_purchases'))
-                                            ->pluck('iva')
-                                            ->sum();
-                                    }),
-
-                                    TextInput::make("total")
-                  ->label("Total purchase")
-                  ->reactive()
-                  ->afterStateUpdated(function ($get) {
-                                    return collect($get('product_purchases'))
-                                        ->pluck('subtotal')
-                                        ->sum();
-                                }),
-
-
-                        TableRepeater::make('invoice_payments')
+                TableRepeater::make('invoice_payments')
                         ->columnWidths([
                             'value_pay' => '150px',
                             'payment_date' => '200px',
                             'payment_method' => '200px',
                             'note' => '300px',
                         ])
-
-                                    ->schema([
-                                        DatePicker::make('payment_date')->required()->maxDate(now())
+                        ->schema([
+                            DatePicker::make('payment_date')->required()->maxDate(now())
                                         ->disableLabel(),
-                                        Select::make('payment_method')
+                            Select::make('payment_method')
                                                 ->options([
                                                     'effective' => 'Effective',
                                                     'transfer' => 'Transfer',
                                                     'cheque' => 'Cheque',
                                                 ])
                                                 ->disableLabel(),
-                                      TextInput::make('value_pay')->required()
+                            TextInput::make('value_pay')->required()
                                       ->reactive()
-                                      ->disableLabel()
-
-                                      ,
+                                      ->disableLabel(),
                                       TextInput::make('note')->required()
                                       ->disableLabel()
-                                                ->Placeholder('Check number, bank, etc'),
-
-
-
-                                      FileUpload::make('evidence')
+                                      ->Placeholder('Check number, bank, etc'),
+                            FileUpload::make('evidence')
                                       ->disableLabel()
                                       ->directory('evidence_payment')
                                       ->enableReordering()
                                       ->enableDownload()
                                       ->enableOpen(),
-
                                     ])->columnSpan('full')
                                     ->createItemButtonLabel('Add Invoice payments'),
-
-
-                                   Placeholder::make("balance")
+                           Placeholder::make("total_balance")
                                     ->label("Total Balance")
-                                    ->content(function ($get) {
-
-                                        $val =collect($get('invoice_payments'))
+                                    ->content(function ($get,$set) {
+                                     $val =collect($get('invoice_payments'))
                                         ->pluck('value_pay')
                                         ->sum();
-
-                                        $val2 =collect($get('product_purchases'))
+                                     $val2 =collect($get('product_purchases'))
                                         ->pluck('subtotal')
                                         ->sum();
+                                      $total_balance= $val2 - $val;
+                                      $set('balance', $total_balance);
 
-                                        return  $val2 - $val;
-                                        })
-
-
-
-
+                                     return  $total_balance;
+                                        }),
+                          Hidden::make('balance')->disabled(),
             ]);
     }
 

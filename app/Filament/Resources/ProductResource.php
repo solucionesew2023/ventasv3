@@ -79,6 +79,7 @@ class ProductResource extends Resource
                      'draft' => 'Draft',
                      'published' => 'Published',
                  ]),
+                 
        Card::make()
                  ->schema([
                     RichEditor::make('description')->required(),
