@@ -159,10 +159,10 @@ class PurchaseResource extends Resource
                                             ->sum();
                                     }),
 
-                                Placeholder::make("total")
-                               
-                                ->label("Total purchase")
-                                ->content(function ($get) {
+                                    TextInput::make("total")
+                  ->label("Total purchase")
+                  ->reactive()
+                  ->afterStateUpdated(function ($get) {
                                     return collect($get('product_purchases'))
                                         ->pluck('subtotal')
                                         ->sum();
