@@ -66,20 +66,14 @@ class PurchaseResource extends Resource
                             'product_price' => '140px',
                             'iva' => '100px',
                             'size' => '100px',
-                        ])
-                         ->relationship()
+                        ])->relationship()
                          ->schema([
-                        Select::make('product_id')->label('Product')
-                         ->disableLabel()
-                         ->required()
+                        Select::make('product_id')->label('Product')->disableLabel()->required()
                          ->options(Product::all()->pluck('name', 'id'))
-                                        ->searchable()
-                                        ->reactive()
+                                        ->searchable()->reactive()
                                         ->afterStateUpdated(function($state, callable $set,$get){
                                             $product=Product::find($state);
-
                                             $set('iva_p', $product->tax->value);
-
                                             if($get('product_price')!="" &&  $get('product_amount') !=""){
                                                 $iva= $get('product_price') *
                                           $get('product_amount') *
@@ -94,8 +88,6 @@ class PurchaseResource extends Resource
                                                 $set('subtotal',0);
                                                 $set('iva', 0);
                                                }
-
-
                                         }),
                         Select::make('color')->label('Color')
                                         ->disableLabel()
@@ -107,14 +99,9 @@ class PurchaseResource extends Resource
                                         ->required()
                                         ->options(Size::all()->pluck('name', 'name'))
                                         ->searchable(),
-
-                      TextInput::make('product_price')->numeric()
-                                        ->disableLabel()
-                                        ->required()
-                                        ->minValue(1)
+                      TextInput::make('product_price')->numeric()->disableLabel()->required()->minValue(1)
                                         ->reactive()
                                         ->afterStateUpdated(function(Closure  $set, $get){
-
                                             if($get('product_price')!="" &&  $get('product_amount') !=""){
                                                 $iva= $get('product_price') *
                                           $get('product_amount') *
@@ -131,15 +118,11 @@ class PurchaseResource extends Resource
                                            }
                                                    }),
                       TextInput::make('product_amount')->numeric()
-                        ->disableLabel()
-                        ->required()
-                        ->minValue(1)
-                        ->reactive()
+                        ->disableLabel()->required()->minValue(1)->reactive()
                         ->afterStateUpdated(function(Closure  $set, $get){
                             if($get('product_price')!="" &&  $get('product_amount') !=""){
                                 $iva= $get('product_price') *
-                          $get('product_amount') *
-                          $get('iva_p');
+                          $get('product_amount') *$get('iva_p');
                           $set('iva', $iva);
                           $set('subtotal',
                           ( $get('product_price') *
@@ -152,24 +135,17 @@ class PurchaseResource extends Resource
                                }
                            }),
                        Hidden::make('iva_p'),
-                       TextInput::make('iva')
-                           ->disableLabel()
-                           ->disabled(),
-                       TextInput::make('subtotal')
-                          ->disableLabel()
-                          ->disabled(),
+                       TextInput::make('iva')->disableLabel()->disabled(),
+                       TextInput::make('subtotal')->disableLabel()->disabled(),
                                     ])->columnSpan('full'),
                  Placeholder::make("total_iva_purchase")
                         ->label("Total iva purchase")
                         ->content(function ($get,$set) {
-                            $valoriva = collect($get('product_purchases'))
-                                     ->pluck('iva')
-                                     ->sum();
+                            $valoriva = collect($get('product_purchases'))->pluck('iva')->sum();
                             $set('total_iva',$valoriva );
                              return $valoriva;
                             }
                             ),
-
                   Placeholder::make("total_purchase")
                             ->label("Total purchase")
                             ->content(function ($get,$set) {
@@ -182,8 +158,6 @@ class PurchaseResource extends Resource
                             ),
                   Hidden::make('total_iva')->disabled(),
                   Hidden::make('total')->disabled(),
-
-
                 TableRepeater::make('invoice_payments')
                         ->columnWidths([
                             'value_pay' => '150px',
@@ -218,20 +192,12 @@ class PurchaseResource extends Resource
                            Placeholder::make("total_balance")
                                     ->label("Total Balance")
                                     ->content(function ($get,$set) {
-                                        
-                                     $val =collect($get('invoice_payments'))
+                               $val =collect($get('invoice_payments'))
                                         ->pluck('value_pay')
                                         ->sum();
-                                       
-                                           
-                                     
-
-                                     $val2 =collect($get('product_purchases'))
-                                        ->pluck('subtotal')
-                                        ->sum();
+                               $val2 =collect($get('product_purchases'))->pluck('subtotal')->sum();
                                       $total_balance= $val2 - $val;
                                       $set('balance', $total_balance);
-
                                      return  $total_balance;
                                         }),
                           Hidden::make('balance')->disabled(),
