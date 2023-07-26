@@ -1,7 +1,7 @@
 <?php
 return[
     'states'=>[
-        'paid' => 'Paid',
-        'credit' => 'Credit'
+        'Paid' => 'Paid',
+        'Credit' => 'Credit'
     ]
     ];

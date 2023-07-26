@@ -44,20 +44,39 @@ class PurchaseResource extends Resource
             ->schema([
                 Grid::make([
                     'default' => 1,
-                    'sm' => 4,
-                    'md' => 4,
-                    'lg' => 4,
-                    'xl' => 4,
-                    '2xl' => 4,
+                    'sm' => 5,
+                    'md' => 5,
+                    'lg' => 5,
+                    'xl' => 5,
+                    '2xl' => 5,
                 ])
                     ->schema([
-                        Select::make('provider_id')->label('Provaider')
+                        Select::make('provider_id')->label('Provaider')->required()
                         ->options(Provider::all()->pluck('name', 'id'))
                         ->searchable(),
-                        DatePicker::make('purchase_date')->required()->maxDate(now()),
                         TextInput::make('invoice_number')->required(),
+                        DatePicker::make('purchase_date')->required()->maxDate(now()),
                         Select::make('state')->required()
-                                ->options(config('statepay.states')),
+                                ->options(config('statepay.states'))
+                                ->reactive()
+                                ->afterStateUpdated(fn(callable $set) => $set('payments_date', null))
+                                ,
+                        DatePicker::make('payments_date')->required()->minDate(now())
+                        ->hidden(function ( callable $get ) {
+                                if($get('state')=='Credit'){
+                                     return false;
+                                 }
+                                 return true;
+
+
+
+                             }
+
+                        )
+
+
+                        ,
+
                             ]),
                         TableRepeater::make('product_purchases')
                         ->columnWidths([
@@ -65,7 +84,8 @@ class PurchaseResource extends Resource
                             'product_amount' => '90px',
                             'product_price' => '140px',
                             'iva' => '100px',
-                            'size' => '100px',
+                            'size' => '120px',
+                            'color' => '100px',
                         ])->relationship()
                          ->schema([
                         Select::make('product_id')->label('Product')->disableLabel()->required()
@@ -138,6 +158,14 @@ class PurchaseResource extends Resource
                        TextInput::make('iva')->disableLabel()->disabled(),
                        TextInput::make('subtotal')->disableLabel()->disabled(),
                                     ])->columnSpan('full'),
+
+                                    TextInput::make('reteiva')->numeric()->default(0)->required(),
+                                    TextInput::make('reteica')->numeric()->default(0)->required(),
+                                    TextInput::make('retefuente')->numeric()->default(0)->required(),
+                                    TextInput::make('freight')->numeric()->default(0)->required(),
+                                    TextInput::make('discount')->Numeric()->default(0)->required(),
+
+
                  Placeholder::make("total_iva_purchase")
                         ->label("Total iva purchase")
                         ->content(function ($get,$set) {
@@ -158,6 +186,7 @@ class PurchaseResource extends Resource
                             ),
                   Hidden::make('total_iva')->disabled(),
                   Hidden::make('total')->disabled(),
+
                 TableRepeater::make('invoice_payments')
                         ->columnWidths([
                             'value_pay' => '150px',
@@ -175,7 +204,7 @@ class PurchaseResource extends Resource
                                                     'cheque' => 'Cheque',
                                                 ])
                                                 ->disableLabel(),
-                            TextInput::make('value_pay')->required()
+                            TextInput::make('value_pay')->required()->default(0)->numeric()
                                       ->reactive()
                                       ->disableLabel(),
                                       TextInput::make('note')->required()
@@ -192,9 +221,19 @@ class PurchaseResource extends Resource
                            Placeholder::make("total_balance")
                                     ->label("Total Balance")
                                     ->content(function ($get,$set) {
+
+                                        if(!$get('value_pay')){
+
                                $val =collect($get('invoice_payments'))
                                         ->pluck('value_pay')
                                         ->sum();
+                                        }
+                                        else{
+                                            $val=0;
+                                        }
+
+
+
                                $val2 =collect($get('product_purchases'))->pluck('subtotal')->sum();
                                       $total_balance= $val2 - $val;
                                       $set('balance', $total_balance);
