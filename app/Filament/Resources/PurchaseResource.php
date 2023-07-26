@@ -77,9 +77,11 @@ class PurchaseResource extends Resource
                                         ->reactive()
                                         ->afterStateUpdated(function($state, callable $set,$get){
                                             $product=Product::find($state);
-                                            
+
                                             $set('iva_p', $product->tax->value);
-                                            $iva= $get('product_price') *
+
+                                            if($get('product_price')!="" &&  $get('product_amount') !=""){
+                                                $iva= $get('product_price') *
                                           $get('product_amount') *
                                           $get('iva_p');
                                           $set('iva', $iva);
@@ -87,6 +89,13 @@ class PurchaseResource extends Resource
                                           ( $get('product_price') *
                                           $get('product_amount')) +
                                           $get('iva'));
+                                            }
+                                            else {
+                                                $set('subtotal',0);
+                                                $set('iva', 0);
+                                               }
+
+
                                         }),
                         Select::make('color')->label('Color')
                                         ->disableLabel()
@@ -105,7 +114,9 @@ class PurchaseResource extends Resource
                                         ->minValue(1)
                                         ->reactive()
                                         ->afterStateUpdated(function(Closure  $set, $get){
-                                          $iva= $get('product_price') *
+
+                                            if($get('product_price')!="" &&  $get('product_amount') !=""){
+                                                $iva= $get('product_price') *
                                           $get('product_amount') *
                                           $get('iva_p');
                                           $set('iva', $iva);
@@ -113,6 +124,11 @@ class PurchaseResource extends Resource
                                           ( $get('product_price') *
                                           $get('product_amount')) +
                                           $get('iva'));
+                                            }
+                                           else {
+                                            $set('subtotal',0);
+                                            $set('iva', 0);
+                                           }
                                                    }),
                       TextInput::make('product_amount')->numeric()
                         ->disableLabel()
@@ -120,14 +136,20 @@ class PurchaseResource extends Resource
                         ->minValue(1)
                         ->reactive()
                         ->afterStateUpdated(function(Closure  $set, $get){
-                                        $iva= $get('product_price') *
-                                        $get('product_amount') *
-                                        $get('iva_p');
-                                        $set('iva', $iva);
-                                        $set('subtotal',
-                                      ( $get('product_price') *
-                                        $get('product_amount')) +
-                                        $get('iva'));
+                            if($get('product_price')!="" &&  $get('product_amount') !=""){
+                                $iva= $get('product_price') *
+                          $get('product_amount') *
+                          $get('iva_p');
+                          $set('iva', $iva);
+                          $set('subtotal',
+                          ( $get('product_price') *
+                          $get('product_amount')) +
+                          $get('iva'));
+                            }
+                            else {
+                                $set('subtotal',0);
+                                $set('iva', 0);
+                               }
                            }),
                        Hidden::make('iva_p'),
                        TextInput::make('iva')
@@ -196,9 +218,14 @@ class PurchaseResource extends Resource
                            Placeholder::make("total_balance")
                                     ->label("Total Balance")
                                     ->content(function ($get,$set) {
+                                        
                                      $val =collect($get('invoice_payments'))
                                         ->pluck('value_pay')
                                         ->sum();
+                                       
+                                           
+                                     
+
                                      $val2 =collect($get('product_purchases'))
                                         ->pluck('subtotal')
                                         ->sum();
