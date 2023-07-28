@@ -161,8 +161,8 @@ class PurchaseResource extends Resource
 
                                     TextInput::make("total")
                   ->label("Total purchase")
-                  ->reactive()
-                  ->afterStateUpdated(function ($get) {
+
+                 ->afterStateHydrated(function ($get) {
                                     return collect($get('product_purchases'))
                                         ->pluck('subtotal')
                                         ->sum();
