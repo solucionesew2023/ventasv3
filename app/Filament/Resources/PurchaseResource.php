@@ -44,46 +44,72 @@ class PurchaseResource extends Resource
             ->schema([
                 Grid::make([
                     'default' => 1,
-                    'sm' => 4,
-                    'md' => 4,
-                    'lg' => 4,
-                    'xl' => 4,
-                    '2xl' => 4,
+                    'sm' => 5,
+                    'md' => 5,
+                    'lg' => 5,
+                    'xl' => 5,
+                    '2xl' => 5,
                 ])
                     ->schema([
-                        Select::make('provider_id')->label('Provaider')
+                        Select::make('provider_id')->label('Provaider')->required()
                         ->options(Provider::all()->pluck('name', 'id'))
                         ->searchable(),
-                        DatePicker::make('purchase_date')->required()->maxDate(now()),
                         TextInput::make('invoice_number')->required(),
+                        DatePicker::make('purchase_date')->required()->maxDate(now()),
                         Select::make('state')->required()
-                                ->options(config('statepay.states')),
+                                ->options(config('statepay.states'))
+                                ->reactive()
+                                ->afterStateUpdated(fn(callable $set) => $set('payments_date', null))
+                                ,
+                        DatePicker::make('payments_date')->required()->minDate(now())
+                        ->hidden(function ( callable $get ) {
+                                if($get('state')=='Credit'){
+                                     return false;
+                                 }
+                                 return true;
 
-                                ]),
+
+
+                             }
+
+                        )
+
+
+                        ,
+
+                            ]),
                         TableRepeater::make('product_purchases')
                         ->columnWidths([
                             'subtotal' => '150px',
                             'product_amount' => '90px',
                             'product_price' => '140px',
                             'iva' => '100px',
-                            'size' => '100px',
-                        ])
-                         ->relationship()
+                            'size' => '120px',
+                            'color' => '100px',
+                        ])->relationship()
                          ->schema([
-                         Select::make('product_id')->label('Product')
-                         ->disableLabel()
-                         ->required()
+                        Select::make('product_id')->label('Product')->disableLabel()->required()
                          ->options(Product::all()->pluck('name', 'id'))
-                                        ->searchable()
-                                        ->reactive()
-                                        ->afterStateUpdated(function($state, callable $set){
+                                        ->searchable()->reactive()
+                                        ->afterStateUpdated(function($state, callable $set,$get){
                                             $product=Product::find($state);
                                             $set('iva_p', $product->tax->value);
-
-
+                                            if($get('product_price')!="" &&  $get('product_amount') !=""){
+                                                $iva= $get('product_price') *
+                                          $get('product_amount') *
+                                          $get('iva_p');
+                                          $set('iva', $iva);
+                                          $set('subtotal',
+                                          ( $get('product_price') *
+                                          $get('product_amount')) +
+                                          $get('iva'));
+                                            }
+                                            else {
+                                                $set('subtotal',0);
+                                                $set('iva', 0);
+                                               }
                                         }),
-
-                                        Select::make('color')->label('Color')
+                        Select::make('color')->label('Color')
                                         ->disableLabel()
                                         ->required()
                                         ->options(Color::all()->pluck('name', 'name'))
@@ -93,140 +119,127 @@ class PurchaseResource extends Resource
                                         ->required()
                                         ->options(Size::all()->pluck('name', 'name'))
                                         ->searchable(),
-
-                                        TextInput::make('product_price')->numeric()
-                                        ->disableLabel()
-                                        ->required()
-                                        ->minValue(1)
+                      TextInput::make('product_price')->numeric()->disableLabel()->required()->minValue(1)
                                         ->reactive()
                                         ->afterStateUpdated(function(Closure  $set, $get){
-                                                    $iva= $get('product_price') *
-                                                          $get('product_amount') *
-                                                          $get('iva_p');
-
-
-                                                    $set('iva', $iva);
-
-                                                    $set('subtotal',
-                                                     ( $get('product_price') *
-                                                      $get('product_amount')) +
-                                                      $get('iva'));
-
-
-
-
-
+                                            if($get('product_price')!="" &&  $get('product_amount') !=""){
+                                                $iva= $get('product_price') *
+                                          $get('product_amount') *
+                                          $get('iva_p');
+                                          $set('iva', $iva);
+                                          $set('subtotal',
+                                          ( $get('product_price') *
+                                          $get('product_amount')) +
+                                          $get('iva'));
+                                            }
+                                           else {
+                                            $set('subtotal',0);
+                                            $set('iva', 0);
+                                           }
                                                    }),
-
-                        TextInput::make('product_amount')->numeric()
-                        ->disableLabel()
-                        ->required()
-                                                    ->minValue(1)
-                                                   ->reactive()
-                                                   ->afterStateUpdated(function(Closure  $set, $get){
-                                                    $iva= $get('product_price') *
-                                                          $get('product_amount') *
-                                                          $get('iva_p');
-
-
-                                                    $set('iva', $iva);
-
-                                                    $set('subtotal',
-                                                     ( $get('product_price') *
-                                                      $get('product_amount')) +
-                                                      $get('iva'));
-
-
+                      TextInput::make('product_amount')->numeric()
+                        ->disableLabel()->required()->minValue(1)->reactive()
+                        ->afterStateUpdated(function(Closure  $set, $get){
+                            if($get('product_price')!="" &&  $get('product_amount') !=""){
+                                $iva= $get('product_price') *
+                          $get('product_amount') *$get('iva_p');
+                          $set('iva', $iva);
+                          $set('subtotal',
+                          ( $get('product_price') *
+                          $get('product_amount')) +
+                          $get('iva'));
+                            }
+                            else {
+                                $set('subtotal',0);
+                                $set('iva', 0);
+                               }
                            }),
-                           Hidden::make('iva_p'),
-                           TextInput::make('iva')
-                           ->disableLabel()
-                                                     ->disabled(),
-                        TextInput::make('subtotal')
-                          ->disableLabel()
-                                                    ->disabled(),
+                       Hidden::make('iva_p'),
+                       TextInput::make('iva')->disableLabel()->disabled(),
+                       TextInput::make('subtotal')->disableLabel()->disabled(),
+                                    ])->columnSpan('full'),
+
+                                    TextInput::make('reteiva')->numeric()->default(0)->required(),
+                                    TextInput::make('reteica')->numeric()->default(0)->required(),
+                                    TextInput::make('retefuente')->numeric()->default(0)->required(),
+                                    TextInput::make('freight')->numeric()->default(0)->required(),
+                                    TextInput::make('discount')->Numeric()->default(0)->required(),
 
 
-                                    ])
-                                    ->columnSpan('full'),
+                 Placeholder::make("total_iva_purchase")
+                        ->label("Total iva purchase")
+                        ->content(function ($get,$set) {
+                            $valoriva = collect($get('product_purchases'))->pluck('iva')->sum();
+                            $set('total_iva',$valoriva );
+                             return $valoriva;
+                            }
+                            ),
+                  Placeholder::make("total_purchase")
+                            ->label("Total purchase")
+                            ->content(function ($get,$set) {
+                            $valort = collect($get('product_purchases'))
+                                     ->pluck('subtotal')
+                                     ->sum();
+                            $set('total',$valort );
+                             return $valort;
+                            }
+                            ),
+                  Hidden::make('total_iva')->disabled(),
+                  Hidden::make('total')->disabled(),
 
-
-                                    Placeholder::make("total_iva")
-                                    ->label("Total iva")
-                                    ->content(function ($get) {
-                                        return collect($get('product_purchases'))
-                                            ->pluck('iva')
-                                            ->sum();
-                                    }),
-
-                                    TextInput::make("total")
-                  ->label("Total purchase")
-
-                 ->afterStateHydrated(function ($get) {
-                                    return collect($get('product_purchases'))
-                                        ->pluck('subtotal')
-                                        ->sum();
-                                }),
-
-
-                        TableRepeater::make('invoice_payments')
+                TableRepeater::make('invoice_payments')
                         ->columnWidths([
                             'value_pay' => '150px',
                             'payment_date' => '200px',
                             'payment_method' => '200px',
                             'note' => '300px',
                         ])
-
-                                    ->schema([
-                                        DatePicker::make('payment_date')->required()->maxDate(now())
+                        ->schema([
+                            DatePicker::make('payment_date')->required()->maxDate(now())
                                         ->disableLabel(),
-                                        Select::make('payment_method')
+                            Select::make('payment_method')
                                                 ->options([
                                                     'effective' => 'Effective',
                                                     'transfer' => 'Transfer',
                                                     'cheque' => 'Cheque',
                                                 ])
                                                 ->disableLabel(),
-                                      TextInput::make('value_pay')->required()
+                            TextInput::make('value_pay')->required()->default(0)->numeric()
                                       ->reactive()
-                                      ->disableLabel()
-
-                                      ,
+                                      ->disableLabel(),
                                       TextInput::make('note')->required()
                                       ->disableLabel()
-                                                ->Placeholder('Check number, bank, etc'),
-
-
-
-                                      FileUpload::make('evidence')
+                                      ->Placeholder('Check number, bank, etc'),
+                            FileUpload::make('evidence')
                                       ->disableLabel()
                                       ->directory('evidence_payment')
                                       ->enableReordering()
                                       ->enableDownload()
                                       ->enableOpen(),
-
                                     ])->columnSpan('full')
                                     ->createItemButtonLabel('Add Invoice payments'),
-
-
-                                   Placeholder::make("balance")
+                           Placeholder::make("total_balance")
                                     ->label("Total Balance")
-                                    ->content(function ($get) {
+                                    ->content(function ($get,$set) {
 
-                                        $val =collect($get('invoice_payments'))
+                                        if(!$get('value_pay')){
+
+                               $val =collect($get('invoice_payments'))
                                         ->pluck('value_pay')
                                         ->sum();
-
-                                        $val2 =collect($get('product_purchases'))
-                                        ->pluck('subtotal')
-                                        ->sum();
-
-                                        return  $val2 - $val;
-                                        })
+                                        }
+                                        else{
+                                            $val=0;
+                                        }
 
 
 
-
+                               $val2 =collect($get('product_purchases'))->pluck('subtotal')->sum();
+                                      $total_balance= $val2 - $val;
+                                      $set('balance', $total_balance);
+                                     return  $total_balance;
+                                        }),
+                          Hidden::make('balance')->disabled(),
             ]);
     }
 
