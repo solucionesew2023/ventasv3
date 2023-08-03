@@ -4,7 +4,10 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers;
+use App\Filament\Resources\CategoryResource\RelationManagers\BransRelationManager;
+
 use App\Models\Category;
+use Filament\Forms\Components\Select;
 use Illuminate\Support\Str;
 use Filament\Forms;
 use Filament\Resources\Form;
@@ -40,7 +43,10 @@ class CategoryResource extends Resource
                 ->afterStateUpdated(fn ($state, callable $set)=> $set('slug',Str::slug($state))),
                     TextInput::make('slug')->required()
                                            ->unique(ignoreRecord:true)
-                                           ])
+                ]),
+                Select::make('brands')
+                    ->multiple()
+                    ->relationship('brands', 'name')->preload()
             ]);
     }
 
@@ -62,6 +68,14 @@ class CategoryResource extends Resource
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
             ]);
+    }
+
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\BransRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

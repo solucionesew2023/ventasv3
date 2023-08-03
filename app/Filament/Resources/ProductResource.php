@@ -44,7 +44,7 @@ class ProductResource extends Resource
                 ->label('Category')
                 ->options(Category::all()->pluck(value:'name', key:'id')->toArray())
                 ->reactive()
-                ->afterStateUpdated(fn(callable $set) => $set('subcategory_id', null)),
+                ->afterStateUpdated(fn(callable $set) => $set('subcategory_id', null,'brand_id',null)),
 
    Select::make( name: 'subcategory_id' )
                 ->label(label: 'SubCategory')
@@ -64,10 +64,26 @@ class ProductResource extends Resource
                 ->afterStateUpdated(fn ($state, callable $set)=> $set('slug',Str::slug($state))),
        TextInput::make('slug')->required()
                  ->unique(ignoreRecord:true),
+
+
        Select::make('brand_id')
                  ->label('Brands')
                  ->required()
-                 ->options(Brand::all()->pluck(value:'name', key:'id')->toArray()),
+                 ->options( function ( callable $get ) {
+
+                    $category = Category::find( $get('category_id'));
+
+                    if($category){
+                        return $category->brands->pluck('name', 'id');
+                    }
+                    return Brand::all()->pluck('name','id');
+                     }),
+
+
+
+
+
+
        Select::make('tax_id')
                  ->label('Taxes')
                  ->required()
@@ -79,7 +95,7 @@ class ProductResource extends Resource
                      'draft' => 'Draft',
                      'published' => 'Published',
                  ]),
-                 
+
        Card::make()
                  ->schema([
                     RichEditor::make('description')->required(),
